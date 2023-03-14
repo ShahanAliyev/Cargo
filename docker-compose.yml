@@ -1,13 +1,35 @@
 version: "3.9"
-   
+
 services:
   db:
     image: postgres
     volumes:
-      - ./data/db:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
       - POSTGRES_DB=cargodb
       - POSTGRES_USER=shahan
       - POSTGRES_PASSWORD=54321
+
+  redis:
+    image: redis:alpine
+  celery:
+    build: .
+    command: celery -A Cargo worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+  celery-beat:
+    build: .
+    command: celery -A Cargo beat -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
