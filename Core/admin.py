@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import PhonePrefix, WareHouse
 
-# Register your models here.
+admin.site.register(PhonePrefix)
+admin.site.register(WareHouse)
