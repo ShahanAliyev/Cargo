@@ -6,7 +6,11 @@ class PhonePrefix(models.Model): # This model might be located in diffirent app
 
 
 class WareHouse(models.Model): # This model might be located in diffirent app 
-    ...
+
+
+    class Meta:
+        verbose_name_plural = "Warehouses"
+
 
 class Currency(models.Model):
 
@@ -15,7 +19,11 @@ class Currency(models.Model):
     rate = models.FloatField()
 
     def __str__(self):
-        return f'{self.name} {self.id}'
+        return f'{self.name} {self.id}' 
+
+
+    class Meta:
+        verbose_name_plural = "Currencies"
 
 
 from django.contrib.auth import get_user_model
@@ -31,3 +39,16 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name}'s {self.currency.name} balance {self.balance}"
+    
+
+class Country(models.Model):
+
+    name = models.CharField(max_length=32)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+
+    class Meta:
+        verbose_name_plural = "Countries"
