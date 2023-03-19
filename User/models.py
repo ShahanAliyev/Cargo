@@ -51,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     gov_prefix = models.CharField(choices=GOV_PREFIX, max_length=3)
     gov_id = models.CharField(max_length=8)
     fin_code = models.CharField(
-        unique=True, max_length=8 ,validators = [RegexValidator(r'^[0-9,A-Z,a-z]{7}$',
+        unique=True, max_length=8 ,validators = [RegexValidator(r'^[0-9A-Za-z]{7}$',
         message="Fin Code has to be 7 characters with letters and digits")]
         )
     client_code = models.CharField(max_length=8, null=True, blank=True, unique=True)
