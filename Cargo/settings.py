@@ -147,3 +147,6 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 AUTH_USER_MODEL = "User.User"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

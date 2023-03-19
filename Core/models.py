@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.utils.text import slugify
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -96,3 +97,22 @@ class ContactUs(SingletonModel):
     class Meta:
         verbose_name = "Contact US"
         verbose_name_plural = "Contact US"
+
+
+class News(models.Model):
+
+    title = models.CharField(max_length=64)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    content = models.TextField()
+    image = models.ImageField(upload_to="media/images/news", null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    # category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True) if needed
+    # tags = models.ForeignKey(Tags, on_delete=models.CASCADE, null=True, blank=True) if needed
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.user.id}")
+        super().save(*args, **kwargs)
