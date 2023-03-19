@@ -2,7 +2,22 @@ from django.db import models
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
-    ...
+
+    # PREFIXES = (
+    #     ('+99455','+99455'),
+    #     ('+99450','+99450'),
+    #     ('+99451','+99451'),
+    #     ('+99470','+99470'),
+    #     ('+99477','+99477'),
+    #     ('+99499','+99499'),
+    # ) 
+    # since task requires not choice field, I decided to keep it as Charfield. 
+    # I think in that way any user could not add new prefixes (they just could use existing ones)  
+
+    prefix = models.CharField(max_length=6)
+
+    def __str__(self):
+        return self.prefix 
 
 
 class WareHouse(models.Model): # This model might be located in diffirent app 
