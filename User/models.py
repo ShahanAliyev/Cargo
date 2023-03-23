@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+import re
+from django.core.exceptions import ValidationError
 
 import random
 import string
@@ -76,15 +78,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
+    # def clean(self):
+    #     if self.gov_prefix == "AZE" and len(self.gov_id) !=8:
+    #         raise ValueError("Gov id must be exactly 8 digits")
+    #     elif self.gov_prefix == "AA" and len(self.gov_id) !=7:
+    #         raise ValueError("Gov id must be exactly 7 digits")
+    #     elif (self.gov_prefix == "MYI" or self.gov_prefix == "DYI") and (len(self.gov_id) !=5 or len(self.gov_id) !=6):
+    #         raise ValueError("Gov id must be either 5 or 6 digits")
+    #     elif not self.gov_id.isdigit():
+    #         raise ValueError("Gov id must contain only digits")
+
     def clean(self):
-        if self.gov_prefix == "AZE" and len(self.gov_id) !=8:
-            raise ValueError("Gov id must be exactly 8 digits")
-        elif self.gov_prefix == "AA" and len(self.gov_id) !=7:
-            raise ValueError("Gov id must be exactly 7 digits")
-        elif (self.gov_prefix == "MYI" or self.gov_prefix == "DYI") and (len(self.gov_id) !=5 or len(self.gov_id) !=6):
-            raise ValueError("Gov id must be either 5 or 6 digits")
+        super().clean()
+        if self.gov_prefix == "AZE" and not re.match(r'^\d{8}$', self.gov_id):
+            raise ValidationError("Gov id must be exactly 8 digits")
+        elif self.gov_prefix == "AA" and not re.match(r'^\d{7}$', self.gov_id):
+            raise ValidationError("Gov id must be exactly 7 digits")
+        elif (self.gov_prefix == "MYI" or self.gov_prefix == "DYI") and not re.match(r'^\d{5,6}$', self.gov_id):
+            raise ValidationError("Gov id must be either 5 or 6 digits")
         elif not self.gov_id.isdigit():
-            raise ValueError("Gov id must contain only digits")
+            raise ValidationError("Gov id must contain only digits")
+
+    def clean(self):
+        return super().clean
+
 
 
 def generate_unique_digit():
