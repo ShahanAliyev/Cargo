@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from django.utils.text import slugify
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -26,7 +25,11 @@ class PhonePrefix(models.Model): # This model might be located in diffirent app
 
 class WareHouse(models.Model): # This model might be located in diffirent app 
 
+    name = models.CharField(max_length=32)
 
+    def __str__(self):
+        return self.name
+    
     class Meta:
         verbose_name_plural = "Warehouses"
 
@@ -45,20 +48,6 @@ class Currency(models.Model):
         verbose_name_plural = "Currencies"
 
 
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-
-class Wallet(models.Model):
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-
-    def __str__(self):
-        return f"{self.user.first_name}'s {self.currency.name} balance {self.balance}"
-    
 
 class Country(models.Model):
 
@@ -67,7 +56,6 @@ class Country(models.Model):
 
     def __str__(self):
         return self.name
-    
 
     class Meta:
         verbose_name_plural = "Countries"
@@ -97,22 +85,3 @@ class ContactUs(SingletonModel):
     class Meta:
         verbose_name = "Contact US"
         verbose_name_plural = "Contact US"
-
-
-class News(models.Model):
-
-    title = models.CharField(max_length=64)
-    slug = models.SlugField(unique=True, null=True, blank=True)
-    content = models.TextField()
-    image = models.ImageField(upload_to="media/images/news", null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    # category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True) if needed
-    # tags = models.ForeignKey(Tags, on_delete=models.CASCADE, null=True, blank=True) if needed
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.title}-{self.user.id}")
-        super().save(*args, **kwargs)

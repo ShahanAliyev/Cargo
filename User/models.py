@@ -1,4 +1,4 @@
-from Core.models import PhonePrefix, WareHouse
+from Core.models import PhonePrefix, WareHouse, Currency
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 import re
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
 import random
 import string
@@ -99,10 +100,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         elif not self.gov_id.isdigit():
             raise ValidationError("Gov id must contain only digits")
 
-    def clean(self):
-        return super().clean
-
-
 
 def generate_unique_digit():
     """Generate a random unique 8-digit number."""
@@ -117,3 +114,31 @@ def generate_client_code(sender,instance,created,**kwargs):
         instance.client_code = generate_unique_digit()
         instance.save()
 
+
+class Wallet(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.user.first_name}'s {self.currency.name} balance {self.balance}"
+    
+
+class News(models.Model):
+
+    title = models.CharField(max_length=64)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    content = models.TextField()
+    image = models.ImageField(upload_to="media/images/news", null=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    # category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True) if needed
+    # tags = models.ForeignKey(Tags, on_delete=models.CASCADE, null=True, blank=True) if needed
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.user.id}")
+        super().save(*args, **kwargs)
