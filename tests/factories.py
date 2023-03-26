@@ -34,10 +34,10 @@ class UserFactory(factory.django.DjangoModelFactory):
     # gender = factory.Iterator([choice[0]] for choice in User.GENDERS)
     gender = "M"
     phone_prefix = factory.SubFactory(PhonePrefixFactory)
-    phone = "9250020"
+    phone = "8341321"
     gov_prefix = "AZE"
     # gov_prefix = factory.Iterator([choice[0] for choice in User.GOV_PREFIX])
     gov_id = "18092345"
-    fin_code = "7BB3DDH"
+    fin_code = "7BB3DDM"
     client_code = "12345678"
     warehouse = factory.SubFactory(WareHouseFactory)

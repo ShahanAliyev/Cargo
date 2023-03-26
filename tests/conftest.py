@@ -1,7 +1,7 @@
 import os
 import django
 from django.conf import settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Cargo.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cargo.settings')
 django.setup()
 # Without upper codes terminal pops up error
 

@@ -1,38 +1,20 @@
 from core.models import PhonePrefix, WareHouse, Currency
 from django.core.validators import RegexValidator
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 import re
 from django.core.exceptions import ValidationError
-from django.utils.text import slugify
-
-import random
-import string
-
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+from user.managers import UserManager
+from user.utils import generate_unique_digit
 
 
 class User(AbstractBaseUser, PermissionsMixin):
 
     GENDERS = (
-        ("M", "Man"),
-        ("W", "Woman"),
+        ("M", "Male"),
+        ("F", "Female"),
     )
 
     GOV_PREFIX = (
@@ -49,10 +31,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_prefix = models.ForeignKey(PhonePrefix, on_delete=models.CASCADE, null=True,blank=True)
     phone = models.CharField(
         max_length=7, validators=[RegexValidator(r'^\d{7}$',
-        message="Please enter your valid phone number")]
+        message="Please enter your valid phone number")], unique=True
         )
     gov_prefix = models.CharField(choices=GOV_PREFIX, max_length=3)
-    gov_id = models.CharField(max_length=8)
+    gov_id = models.CharField(max_length=8, unique=True)
     fin_code = models.CharField(
         unique=True, max_length=8 ,validators = [RegexValidator(r'^[0-9A-Za-z]{7}$',
         message="Fin Code has to be 7 characters with letters and digits")]
@@ -100,19 +82,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         elif not self.gov_id.isdigit():
             raise ValidationError("Gov id must contain only digits")
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        if not self.client_code:
+            self.client_code = generate_unique_digit()
+        super(User, self).save(*args, **kwargs)
 
-def generate_unique_digit():
-    """Generate a random unique 8-digit number."""
-    while True:
-        unique_digit = ''.join(random.choices(string.digits, k=8))
-        if not User.objects.filter(client_code=unique_digit).exists():
-            return unique_digit
         
-@receiver(post_save, sender=User)
-def generate_client_code(sender,instance,created,**kwargs):
-    if  not instance.client_code:
-        instance.client_code = generate_unique_digit()
-        instance.save()
+# @receiver(post_save, sender=User)
+# def generate_client_code(sender,instance,created,**kwargs):
+#     if  not instance.client_code:
+#         instance.client_code = generate_unique_digit()
+#         instance.save()
 
 
 class Wallet(models.Model):
@@ -123,22 +104,3 @@ class Wallet(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name}'s {self.currency.name} balance {self.balance}"
-    
-
-class News(models.Model):
-
-    title = models.CharField(max_length=64)
-    slug = models.SlugField(unique=True, null=True, blank=True)
-    content = models.TextField()
-    image = models.ImageField(upload_to="media/images/news", null=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    # category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True) if needed
-    # tags = models.ForeignKey(Tags, on_delete=models.CASCADE, null=True, blank=True) if needed
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.title}-{self.user.id}")
-        super().save(*args, **kwargs)
