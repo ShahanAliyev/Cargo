@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0012_alter_user_first_name_max_length'),
-        ('Core', '0001_initial'),
+        ('core', '0001_initial'),
     ]
 
     operations = [
@@ -38,9 +38,9 @@ class Migration(migrations.Migration):
                 ('is_blocked', models.BooleanField(default=False)),
                 ('date_joined', models.DateTimeField(auto_now_add=True)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
-                ('phone_prefix', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='Core.phoneprefix')),
+                ('phone_prefix', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='core.phoneprefix')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
-                ('warehouse', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='Core.warehouse')),
+                ('warehouse', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='core.warehouse')),
             ],
             options={
                 'verbose_name': 'User',

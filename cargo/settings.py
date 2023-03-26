@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    "Core",
-    "User",
+    "core",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Cargo.urls'
+ROOT_URLCONF = 'cargo.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Cargo.wsgi.application'
+WSGI_APPLICATION = 'cargo.wsgi.application'
 
 
 # Database
@@ -80,9 +80,9 @@ import os
 DATABASES = {
 'default': {
 'ENGINE': 'django.db.backends.postgresql',
-'NAME': os.environ.get('POSTGRES_NAME', 'cargodb'),
-'USER': os.environ.get('POSTGRES_USER', 'shahan'),
-'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '54321'),
+'NAME': os.environ.get('POSTGRES_NAME', 'cargodb_new'),
+'USER': os.environ.get('POSTGRES_USER', 'shahan01'),
+'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '543212345'),
 'HOST': 'localhost',
 'PORT': 5432, #default port you don't need to mention in docker-compose
 }
@@ -141,12 +141,12 @@ from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
     'hello': {
-        'task': 'Core.tasks.hello',
+        'task': 'core.tasks.hello',
         'schedule': crontab()  # execute every minute
     }
 }
 
-AUTH_USER_MODEL = "User.User"
+AUTH_USER_MODEL = "user.User"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

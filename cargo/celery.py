@@ -2,9 +2,9 @@ import os
 from celery import Celery
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Cargo.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cargo.settings')
 
-app = Celery('Cargo')
+app = Celery('cargo')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
 

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Core', '0006_contactus_singletonmodel'),
+        ('core', '0006_contactus_singletonmodel'),
     ]
 
     operations = [

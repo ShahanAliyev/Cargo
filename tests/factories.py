@@ -1,8 +1,8 @@
 import factory
-from Core.models import (
+from core.models import (
     PhonePrefix, WareHouse,
 )
-from User.models import User
+from user.models import User
 
 
 class PhonePrefixFactory(factory.django.DjangoModelFactory):

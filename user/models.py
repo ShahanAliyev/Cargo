@@ -1,4 +1,4 @@
-from Core.models import PhonePrefix, WareHouse, Currency
+from core.models import PhonePrefix, WareHouse, Currency
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models

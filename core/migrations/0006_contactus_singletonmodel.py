@@ -8,7 +8,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Core', '0005_phoneprefix_prefix'),
+        ('core', '0005_phoneprefix_prefix'),
     ]
 
     operations = [
@@ -21,12 +21,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ContactUs',
             fields=[
-                ('singletonmodel_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='Core.singletonmodel')),
+                ('singletonmodel_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='core.singletonmodel')),
                 ('email', models.CharField(max_length=64)),
                 ('phone', models.CharField(max_length=7, validators=[django.core.validators.RegexValidator('^\\d{7}$', message='Please enter valid phone number')])),
                 ('working_hours', models.CharField(max_length=16)),
-                ('phone_prefix', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='Core.phoneprefix')),
+                ('phone_prefix', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='core.phoneprefix')),
             ],
-            bases=('Core.singletonmodel',),
+            bases=('core.singletonmodel',),
         ),
     ]

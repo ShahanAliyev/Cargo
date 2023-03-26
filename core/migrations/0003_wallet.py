@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('Core', '0002_currency'),
+        ('core', '0002_currency'),
     ]
 
     operations = [
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('balance', models.DecimalField(decimal_places=2, default=0, max_digits=5)),
-                ('currency', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='Core.currency')),
+                ('currency', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.currency')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
