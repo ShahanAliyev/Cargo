@@ -62,15 +62,8 @@ class Country(models.Model):
         verbose_name_plural = "Countries"
 
 
-class SingletonModel(models.Model):
 
-    def save(self,*args,**kwargs):
-        self.pk = 1
-
-        super().save(*args, **kwargs)
-
-
-class ContactUs(SingletonModel):
+class ContactUs(models.Model):
 
     email = models.CharField(max_length=64)
     phone_prefix = models.ForeignKey(PhonePrefix, on_delete=models.CASCADE, null=True,blank=True)
@@ -86,6 +79,13 @@ class ContactUs(SingletonModel):
     class Meta:
         verbose_name = "Contact US"
         verbose_name_plural = "Contact US"
+    
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(ContactUs, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        pass  # prevent deletion of instance
 
 
 from django.contrib.auth import get_user_model
