@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+import os
 
 
 # Quick-start development settings - unsuitable for production
@@ -79,12 +80,12 @@ WSGI_APPLICATION = 'cargo.wsgi.application'
 import os
 DATABASES = {
 'default': {
-'ENGINE': 'django.db.backends.postgresql',
-'NAME': os.environ.get('POSTGRES_NAME', 'cargodb_new'),
-'USER': os.environ.get('POSTGRES_USER', 'shahan01'),
-'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '543212345'),
-'HOST': 'localhost',
-'PORT': 5432, #default port you don't need to mention in docker-compose
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.environ.get('POSTGRES_NAME', 'cargodb_new'),
+    'USER': os.environ.get('POSTGRES_USER', 'shahan01'),
+    'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '543212345'),
+    'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+    'HOST': 'localhost',
 }
 }
 

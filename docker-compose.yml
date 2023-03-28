@@ -7,10 +7,7 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_DB=cargodb_new
-      - POSTGRES_USER=shahan01
-      - POSTGRES_PASSWORD=543212345
+    env_file: .env
     
   adminer:
     image: adminer
