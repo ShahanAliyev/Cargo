@@ -14,6 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+import os
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    "Core"
+    "core",
+    "user",
 ]
 
 MIDDLEWARE = [
@@ -51,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Cargo.urls'
+ROOT_URLCONF = 'cargo.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Cargo.wsgi.application'
+WSGI_APPLICATION = 'cargo.wsgi.application'
 
 
 # Database
@@ -78,12 +80,12 @@ WSGI_APPLICATION = 'Cargo.wsgi.application'
 import os
 DATABASES = {
 'default': {
-'ENGINE': 'django.db.backends.postgresql',
-'NAME': os.environ.get('POSTGRES_NAME', 'cargodb'),
-'USER': os.environ.get('POSTGRES_USER', 'shahan'),
-'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '54321'),
-'HOST': 'localhost',
-'PORT': 5432, #default port you don't need to mention in docker-compose
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.environ.get('POSTGRES_NAME', 'cargodb_new'),
+    'USER': os.environ.get('POSTGRES_USER', 'shahan01'),
+    'PASSWORD': os.environ.get('POSTGRES_PASSWORD', '543212345'),
+    'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+    'HOST': 'localhost',
 }
 }
 
@@ -105,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend',]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -139,7 +142,12 @@ from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
     'hello': {
-        'task': 'Core.tasks.hello',
+        'task': 'core.tasks.hello',
         'schedule': crontab()  # execute every minute
     }
 }
+
+AUTH_USER_MODEL = "user.User"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')

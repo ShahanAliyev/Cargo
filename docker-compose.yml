@@ -7,10 +7,13 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
     ports:
       - 5432:5432
-    environment:
-      - POSTGRES_DB=cargodb
-      - POSTGRES_USER=shahan
-      - POSTGRES_PASSWORD=54321
+    env_file: .env
+    
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
 
   redis:
     image: redis:alpine
@@ -33,3 +36,5 @@ services:
 
 volumes:
   postgres_data:
+
+# root@76b973b41d44:/# psql -U shahan -d cargodb
