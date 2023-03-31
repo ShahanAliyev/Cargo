@@ -85,7 +85,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         self.full_clean()
         if not self.client_code:
-            self.client_code = generate_unique_digit()
+            while True:
+                code = generate_unique_digit()
+                if not User.objects.filter(client_code=code).exists():
+                    self.client_code = code
+                    break
         super(User, self).save(*args, **kwargs)
 
         
