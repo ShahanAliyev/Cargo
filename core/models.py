@@ -141,7 +141,7 @@ class FAQ(models.Model):
 
     question = models.CharField(max_length=256)
     answer = models.TextField()
-    status = models.IntegerField(choices=FAQ_STATUS, default=1, max_length=1)
+    status = models.IntegerField(choices=FAQ_STATUS, default=ACTIVE)
     category = models.ForeignKey(CategoryFAQ, on_delete=models.CASCADE, related_name="questions")
     order = models.IntegerField(default=0) # to display decent queue of questions
 
