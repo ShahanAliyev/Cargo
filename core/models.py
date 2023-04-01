@@ -105,7 +105,49 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+
+        verbose_name_plural = "News"
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.title}-{self.user.id}")
         super().save(*args, **kwargs)
+
+
+
+class CategoryFAQ(models.Model):
+
+    name = models.CharField(max_length=32, unique=True)
+
+    class Meta:
+
+        verbose_name = "FAQ Category"
+        verbose_name_plural = "FAQ Categories"
+
+    def __str__(self):
+        return self.name
+    
+
+class FAQ(models.Model):
+
+    ACTIVE = 1
+    DEACTIVE = 0
+
+    FAQ_STATUS = (
+        (ACTIVE,'Active'),
+        (DEACTIVE,'Deactive'),
+    )
+
+    question = models.CharField(max_length=256)
+    answer = models.TextField()
+    status = models.IntegerField(choices=FAQ_STATUS, default=1, max_length=1)
+    category = models.ForeignKey(CategoryFAQ, on_delete=models.CASCADE, related_name="questions")
+    order = models.IntegerField(default=0) # to display decent queue of questions
+
+    class Meta:
+
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question    
