@@ -109,3 +109,34 @@ class News(models.Model):
         if not self.slug:
             self.slug = slugify(f"{self.title}-{self.user.id}")
         super().save(*args, **kwargs)
+
+
+class Tariff(models.Model):
+
+    FIXED = 1
+    PER_GRAM = 2
+
+    FIXED_PER_GRAM = (
+        (FIXED, 'Fixed'),
+        (PER_GRAM, 'Per Gram')
+    )
+
+    LIQUID = 1
+    NOT_LIQUID = 0
+
+    LIQUID_OR_NOT = (
+        (LIQUID, 'Liquid'),
+        (NOT_LIQUID, 'Not Liquid')
+    )
+
+    min_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    max_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tarifs')
+    base_price = models.DecimalField(max_digits=6, decimal_places=2)
+    fixed_or_per_gram = models.IntegerField(choices=FIXED_PER_GRAM, default=PER_GRAM)
+    is_liquid = models.IntegerField(choices=LIQUID_OR_NOT, default=NOT_LIQUID)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"From {self.min_weight} to {self.max_weight} for {self.country.name}"
+
