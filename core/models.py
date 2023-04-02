@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -116,28 +117,20 @@ class News(models.Model):
 
 class Tariff(models.Model):
 
-    FIXED = 1
-    PER_GRAM = 2
+    class FixedPerGram(models.IntegerChoices):
+        FIXED = 1, _('Fixed')
+        PER_GRAM = 2, _('Per Gram')
 
-    FIXED_PER_GRAM = (
-        (FIXED, 'Fixed'),
-        (PER_GRAM, 'Per Gram')
-    )
-
-    LIQUID = 1
-    NOT_LIQUID = 0
-
-    LIQUID_OR_NOT = (
-        (LIQUID, 'Liquid'),
-        (NOT_LIQUID, 'Not Liquid')
-    )
+    class LiquidOrNot(models.IntegerChoices):
+        LIQUID = 1, _('Liquid')
+        NOT_LIQUID = 0, _('Not Liquid')
 
     min_weight = models.DecimalField(max_digits=4, decimal_places=1)
     max_weight = models.DecimalField(max_digits=4, decimal_places=1)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tarifs')
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tariffs')
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
-    fixed_or_per_gram = models.IntegerField(choices=FIXED_PER_GRAM, default=PER_GRAM)
-    is_liquid = models.IntegerField(choices=LIQUID_OR_NOT, default=NOT_LIQUID)
+    fixed_or_per_gram = models.IntegerField(choices=FixedPerGram.choices, default=FixedPerGram.PER_GRAM)
+    is_liquid = models.IntegerField(choices=LiquidOrNot.choices, default=LiquidOrNot.NOT_LIQUID)
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
