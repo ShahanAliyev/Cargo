@@ -105,6 +105,9 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name_plural = 'News'
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.title}-{self.user.id}")
