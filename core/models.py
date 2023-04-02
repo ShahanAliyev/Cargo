@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -116,23 +117,19 @@ class News(models.Model):
 
 class Discount(models.Model):
 
-    CONSTANT = 1
-    PERCENTAGE = 0
+    class DiscountType(models.TextChoices):
+        CONSTANT = 'constant', _('Constant')
+        PERCENTAGE = 'percentage', _('Percentage')
 
-    DISCOUNT_TYPE = (
-        (CONSTANT, 'Constant'),
-        (PERCENTAGE, 'Percentage'),
-    )
+    class DiscountReason(models.TextChoices):
+        FEMALE = 'female', _('Female')
+        YOUNG = 'young', _('Young')
+        SUPERUSER = 'superuser', _('Superuser')
 
-    DISCOUNT_REASON = (
-        ("Female", "Female"),
-        ("Young", "Young"),
-        ("Superuser", "Superuser")
-    )
-
-    constant_or_percentage = models.IntegerField(choices=DISCOUNT_TYPE, default=PERCENTAGE)
+    constant_or_percentage = models.CharField(
+        max_length=10, choices=DiscountType.choices, default=DiscountType.PERCENTAGE)
     amount = models.DecimalField(max_digits=4, decimal_places=2)
-    reason = models.CharField(max_length=32, choices=DISCOUNT_REASON)
+    reason = models.CharField(max_length=32, choices=DiscountReason.choices)
 
     def __str__(self):
         discount_type = self.get_constant_or_percentage_display()
