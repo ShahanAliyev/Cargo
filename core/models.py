@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
+from ckeditor.fields import RichTextField
+
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -131,17 +133,9 @@ class CategoryFAQ(models.Model):
 
 class FAQ(models.Model):
 
-    ACTIVE = 1
-    DEACTIVE = 0
-
-    FAQ_STATUS = (
-        (ACTIVE,'Active'),
-        (DEACTIVE,'Deactive'),
-    )
-
     question = models.CharField(max_length=256)
-    answer = models.TextField()
-    status = models.IntegerField(choices=FAQ_STATUS, default=ACTIVE)
+    answer = RichTextField()
+    status = models.BooleanField(default=False)
     category = models.ForeignKey(CategoryFAQ, on_delete=models.CASCADE, related_name="questions")
     order = models.IntegerField(default=0) # to display decent queue of questions
 

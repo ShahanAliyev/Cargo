@@ -10,6 +10,8 @@ click-plugins==1.1.1
 click-repl==0.2.0
 coverage==7.2.2
 Django==3.2
+django-ckeditor==6.5.1
+django-js-asset==2.0.0
 exceptiongroup==1.1.1
 factory-boy==3.2.1
 Faker==18.3.0
