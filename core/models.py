@@ -109,3 +109,29 @@ class News(models.Model):
         if not self.slug:
             self.slug = slugify(f"{self.title}-{self.user.id}")
         super().save(*args, **kwargs)
+
+
+class Discount(models.Model):
+
+    CONSTANT = 1
+    PERCENTAGE = 0
+
+    DISCOUNT_TYPE = (
+        (CONSTANT, 'Constant'),
+        (PERCENTAGE, 'Percentage'),
+    )
+
+    DISCOUNT_REASON = (
+        ("Female", "Female"),
+        ("Young", "Young"),
+        ("Superuser", "Superuser")
+    )
+
+    constant_or_percentage = models.IntegerField(choices=DISCOUNT_TYPE, default=PERCENTAGE)
+    amount = models.DecimalField(max_digits=4, decimal_places=2)
+    reason = models.CharField(max_length=32, choices=DISCOUNT_REASON)
+
+    def __str__(self):
+        discount_type = self.get_constant_or_percentage_display()
+        reason = self.get_reason_display()
+        return f"{self.amount} {discount_type} for {reason}"
