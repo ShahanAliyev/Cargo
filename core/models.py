@@ -140,7 +140,7 @@ class Discount(models.Model):
 class ProductType(models.Model):
     
     name = models.CharField(max_length=32)
-    type = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    parent_type = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
