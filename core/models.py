@@ -115,6 +115,28 @@ class News(models.Model):
         super().save(*args, **kwargs)
 
 
+class Tariff(models.Model):
+
+    class FixedPerGram(models.IntegerChoices):
+        FIXED = 1, _('Fixed')
+        PER_GRAM = 2, _('Per Gram')
+
+    class LiquidOrNot(models.IntegerChoices):
+        LIQUID = 1, _('Liquid')
+        NOT_LIQUID = 0, _('Not Liquid')
+
+    min_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    max_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tariffs')
+    base_price = models.DecimalField(max_digits=6, decimal_places=2)
+    fixed_or_per_gram = models.IntegerField(choices=FixedPerGram.choices, default=FixedPerGram.PER_GRAM)
+    is_liquid = models.IntegerField(choices=LiquidOrNot.choices, default=LiquidOrNot.NOT_LIQUID)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"From {self.min_weight} to {self.max_weight} for {self.country.name}"
+
+
 class Discount(models.Model):
 
     class DiscountType(models.TextChoices):
