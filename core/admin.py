@@ -1,6 +1,7 @@
 from django.contrib import admin
 from core.models import (
-    PhonePrefix, WareHouse, Currency, Country, ContactUs, News, Discount
+    PhonePrefix, WareHouse, Currency, Country, ContactUs, News,
+    Discount, ProductType
     )
 
 admin.site.register(PhonePrefix)
@@ -10,4 +11,5 @@ admin.site.register(Country)
 admin.site.register(ContactUs)
 admin.site.register(News)
 admin.site.register(Discount)
+admin.site.register(ProductType)
 

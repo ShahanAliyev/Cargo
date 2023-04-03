@@ -135,3 +135,12 @@ class Discount(models.Model):
         discount_type = self.get_constant_or_percentage_display()
         reason = self.get_reason_display()
         return f"{self.amount} {discount_type} for {reason}"
+    
+
+class ProductType(models.Model):
+    
+    name = models.CharField(max_length=32)
+    type = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
