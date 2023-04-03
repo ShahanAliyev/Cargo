@@ -136,3 +136,24 @@ class Tariff(models.Model):
     def __str__(self):
         return f"From {self.min_weight} to {self.max_weight} for {self.country.name}"
 
+
+class Discount(models.Model):
+
+    class DiscountType(models.TextChoices):
+        CONSTANT = 'constant', _('Constant')
+        PERCENTAGE = 'percentage', _('Percentage')
+
+    class DiscountReason(models.TextChoices):
+        FEMALE = 'female', _('Female')
+        YOUNG = 'young', _('Young')
+        SUPERUSER = 'superuser', _('Superuser')
+
+    constant_or_percentage = models.CharField(
+        max_length=10, choices=DiscountType.choices, default=DiscountType.PERCENTAGE)
+    amount = models.DecimalField(max_digits=4, decimal_places=2)
+    reason = models.CharField(max_length=32, choices=DiscountReason.choices)
+
+    def __str__(self):
+        discount_type = self.get_constant_or_percentage_display()
+        reason = self.get_reason_display()
+        return f"{self.amount} {discount_type} for {reason}"
