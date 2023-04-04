@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
+from ckeditor.fields import RichTextField
 from django.utils.translation import gettext_lazy as _
 
 
@@ -106,6 +107,7 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     class Meta:
         verbose_name_plural = 'News'
 
@@ -113,6 +115,57 @@ class News(models.Model):
         if not self.slug:
             self.slug = slugify(f"{self.title}-{self.user.id}")
         super().save(*args, **kwargs)
+
+
+class CategoryFAQ(models.Model):
+
+    name = models.CharField(max_length=32, unique=True)
+
+    class Meta:
+
+        verbose_name = "FAQ Category"
+        verbose_name_plural = "FAQ Categories"
+
+    def __str__(self):
+        return self.name
+    
+
+class FAQ(models.Model):
+
+    question = models.CharField(max_length=256)
+    answer = RichTextField()
+    status = models.BooleanField(default=False)
+    category = models.ForeignKey(CategoryFAQ, on_delete=models.CASCADE, related_name="questions")
+    order = models.IntegerField(default=0) # to display decent queue of questions
+
+    class Meta:
+
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question    
+    
+    
+class Tariff(models.Model):
+
+    class FixedPerGram(models.IntegerChoices):
+        FIXED = 1, _('Fixed')
+        PER_GRAM = 2, _('Per Gram')
+
+    class LiquidOrNot(models.IntegerChoices):
+        LIQUID = 1, _('Liquid')
+        NOT_LIQUID = 0, _('Not Liquid')
+
+    min_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    max_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tariffs')
+    base_price = models.DecimalField(max_digits=6, decimal_places=2)
+    fixed_or_per_gram = models.IntegerField(choices=FixedPerGram.choices, default=FixedPerGram.PER_GRAM)
+    is_liquid = models.IntegerField(choices=LiquidOrNot.choices, default=LiquidOrNot.NOT_LIQUID)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f"From {self.min_weight} to {self.max_weight} for {self.country.name}"
 
 
 class Discount(models.Model):
