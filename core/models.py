@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils.text import slugify
+from ckeditor.fields import RichTextField
 from django.utils.translation import gettext_lazy as _
 
 
@@ -106,6 +107,7 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     class Meta:
         verbose_name_plural = 'News'
 
@@ -115,6 +117,35 @@ class News(models.Model):
         super().save(*args, **kwargs)
 
 
+class CategoryFAQ(models.Model):
+
+    name = models.CharField(max_length=32, unique=True)
+
+    class Meta:
+
+        verbose_name = "FAQ Category"
+        verbose_name_plural = "FAQ Categories"
+
+    def __str__(self):
+        return self.name
+    
+
+class FAQ(models.Model):
+
+    question = models.CharField(max_length=256)
+    answer = RichTextField()
+    status = models.BooleanField(default=False)
+    category = models.ForeignKey(CategoryFAQ, on_delete=models.CASCADE, related_name="questions")
+    order = models.IntegerField(default=0) # to display decent queue of questions
+
+    class Meta:
+
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question    
+    
+    
 class Tariff(models.Model):
 
     class FixedPerGram(models.IntegerChoices):
