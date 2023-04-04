@@ -1,7 +1,8 @@
 from django.contrib import admin
 from core.models import (
-    PhonePrefix, WareHouse, Currency, Country, 
-    ContactUs, News, FAQ, CategoryFAQ, Discount, Tariff,
+    PhonePrefix, WareHouse, Currency, Country,
+    ContactUs, ProductType, News, FAQ,
+    CategoryFAQ, Discount, Tariff,
     )
 
 admin.site.register(PhonePrefix)
@@ -12,6 +13,7 @@ admin.site.register(News)
 admin.site.register(FAQ)
 admin.site.register(CategoryFAQ)
 admin.site.register(Discount)
+admin.site.register(ProductType)
 
 
 class TariffInline(admin.TabularInline):
