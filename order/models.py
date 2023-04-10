@@ -3,6 +3,8 @@ from core.models import Currency, Country, Discount, ProductType, Tariff
 from django.contrib.auth import get_user_model
 from order.utils import calculate_discounted_cost, generate_tracking_code
 from django.db.models import Q
+from field_history.tracker import FieldHistoryTracker
+
 User = get_user_model()
 
 
@@ -36,6 +38,7 @@ class Declaration(models.Model):
     quantity = models.PositiveSmallIntegerField(default=1)
 
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name='declarations')
+    status_tracker = FieldHistoryTracker(['status'])
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='declarations', blank=True, null=True)
     discount = models.ManyToManyField(Discount, related_name='declarations', blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
@@ -45,9 +48,9 @@ class Declaration(models.Model):
 
     
     def save(self, *args, **kwargs):
-        azn_rate = float(price)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
-        usd_rate = float(price)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
-        tl_rate = float(price)/float(Currency.objects.filter(name="TL").values_list('rate', flat=True).first())
+        if self.cost:
+            azn_rate = float(self.cost)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
+            usd_rate = float(self.cost)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
 
         if not self.status:
             self.status = Status.objects.filter(order = 0).first()
