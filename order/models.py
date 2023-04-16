@@ -3,7 +3,6 @@ from core.models import Currency, Country, Discount, ProductType, Tariff
 from django.contrib.auth import get_user_model
 from order.utils import calculate_discounted_cost, generate_tracking_code
 from django.db.models import Q
-from field_history.tracker import FieldHistoryTracker
 
 User = get_user_model()
 
@@ -19,6 +18,8 @@ class Status(models.Model):
 
 
 class Declaration(models.Model):
+
+    __status = None
 
     tracking_code = models.CharField(max_length=13, unique=True, blank=True, null=True)
 
@@ -38,7 +39,6 @@ class Declaration(models.Model):
     quantity = models.PositiveSmallIntegerField(default=1)
 
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name='declarations')
-    status_tracker = FieldHistoryTracker(['status'])
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='declarations', blank=True, null=True)
     discount = models.ManyToManyField(Discount, related_name='declarations', blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
@@ -46,8 +46,15 @@ class Declaration(models.Model):
     penalty_status = models.BooleanField(default=False)
     penalty = models.DecimalField(max_digits=4, decimal_places=2, default=0, null=True, blank=True)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__status = self.status.id
     
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+
+        if self.id and self.status.id != self.__status:
+            new_status_history = StatusHistory.objects.create(declaration = self, old_status = self.__status, new_status = self.status.id)
+            new_status_history.save()
         if self.cost:
             azn_rate = float(self.cost)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
             usd_rate = float(self.cost)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
@@ -74,7 +81,19 @@ class Declaration(models.Model):
                 self.discounted_cost = 0
                 self.discounted_cost_azn = 0
 
-        super(Declaration, self).save(*args, **kwargs)
+        super(Declaration, self).save(force_insert, force_update, *args, **kwargs)
+        self.__status = self.status.id
 
     def __str__(self):
         return str(self.tracking_code)
+
+
+class StatusHistory(models.Model):
+
+    declaration = models.ForeignKey(Declaration, on_delete=models.CASCADE, null=True, blank=True, related_name="histories")
+    old_status = models.IntegerField(null=True, blank=True)
+    new_status = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.declaration} from {self.old_status} to {self.new_status}"

@@ -1,7 +1,8 @@
 from django.contrib import admin
-from order.models import Status, Declaration
+from order.models import Status, Declaration, StatusHistory
 
 admin.site.register(Status)
+admin.site.register(StatusHistory)
 
 
 @admin.register(Declaration)
