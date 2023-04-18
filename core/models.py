@@ -26,15 +26,20 @@ class PhonePrefix(models.Model): # This model might be located in diffirent app
     class Meta:
         verbose_name_plural = "Phone Prefixes"
 
-class WareHouse(models.Model): # This model might be located in diffirent app 
+class LocalWarehouse(models.Model): # This model might be located in diffirent app 
 
     name = models.CharField(max_length=32)
+    address = models.CharField(max_length=128)
+    longitude = models.DecimalField(max_digits=10, decimal_places=7)
+    latitude = models.DecimalField(max_digits=10, decimal_places=7)
+    is_active = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
     
     class Meta:
-        verbose_name_plural = "Warehouses"
+        verbose_name_plural = "Local Warehouses"
 
 
 class Currency(models.Model):

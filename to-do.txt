@@ -1,0 +1,8 @@
+checking if user passed 300 dollar limit
+
+local warehouse model should be created
+foreign warehouse model should be created
+
+and the tasks remaining from previos sprint such as testing configuration, using black should be handled
+
+extra discount should be checked in discount model itself
