@@ -1,9 +1,9 @@
 from django.db import models
 from core.models import Currency, Country, Discount, ProductType, Tariff
 from django.contrib.auth import get_user_model
-from order.utils import calculate_discounted_cost, generate_tracking_code
+from order.utils import calculate_discounted_cost
 from django.db.models import Q
-from field_history.tracker import FieldHistoryTracker
+
 
 User = get_user_model()
 
@@ -38,7 +38,6 @@ class Declaration(models.Model):
     quantity = models.PositiveSmallIntegerField(default=1)
 
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name='declarations')
-    status_tracker = FieldHistoryTracker(['status'])
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='declarations', blank=True, null=True)
     discount = models.ManyToManyField(Discount, related_name='declarations', blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
