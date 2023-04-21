@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from django.utils.translation import gettext_lazy as _
+from django.db.models import JSONField
 
 
 class PhonePrefix(models.Model): # This model might be located in diffirent app 
@@ -116,6 +117,27 @@ class News(models.Model):
             self.slug = slugify(f"{self.title}-{self.user.id}")
         super().save(*args, **kwargs)
 
+
+class ForeignWarehouse(models.Model):
+
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    airwaybill_address = models.CharField(max_length=32)
+    address_header = models.CharField(max_length=32)
+    client_code = models.CharField(max_length=8, default="C.code")
+    name_surname = models.CharField(max_length=64, default="User's name and surname")
+    address = models.CharField(max_length=128)
+    flexible_data = JSONField()
+    address_for_user = models.CharField(max_length=256, null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.address_for_user = f"{self.client_code}  {self.name_surname} {self.address_header} {self.address_1}"
+
+        super(ForeignWarehouse, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f" Warehouse in {self.country.name}"
+    
 
 class CategoryFAQ(models.Model):
 
