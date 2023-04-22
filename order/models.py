@@ -61,7 +61,6 @@ class Declaration(models.Model):
             
             self.cost = price
             self.cost_azn = azn_rate
-            print(self.cost_azn)
 
         if self.cost and self.id and self.discount:
 
