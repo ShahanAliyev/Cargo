@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 postgres_data
+
+codes.txt
+to-do.txt
