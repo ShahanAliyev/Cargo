@@ -3,6 +3,7 @@ from core.models import Currency, Country, Discount, ProductType, Tariff
 from django.contrib.auth import get_user_model
 from order.utils import calculate_discounted_cost
 from django.db.models import Q
+from decimal import Decimal
 
 
 User = get_user_model()
@@ -47,9 +48,8 @@ class Declaration(models.Model):
 
     
     def save(self, *args, **kwargs):
-        if self.cost:
-            azn_rate = float(self.cost)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
-            usd_rate = float(self.cost)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
+        azn_rate = Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
+        usd_rate = Currency.objects.filter(name="USD").values_list('rate', flat=True).first()
 
         if not self.status:
             self.status = Status.objects.filter(order = 0).first()
@@ -60,18 +60,16 @@ class Declaration(models.Model):
                 & Q(country=self.country)).values_list('base_price', flat=True).first()
             
             self.cost = price
-            self.cost_azn = azn_rate
+            self.cost_azn = price / Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
 
-        if self.cost and self.id and self.discount:
-
-            our_cost = calculate_discounted_cost(self)
-            if our_cost > 0:
-                self.discounted_cost = our_cost
-                self.discounted_cost_azn = our_cost*usd_rate / azn_rate
+        if self.cost and self.pk and self.discount:
+            discounted_cost = calculate_discounted_cost(self)
+            if discounted_cost > 0:
+                self.discounted_cost = discounted_cost
+                self.discounted_cost_azn = Decimal(discounted_cost) * self.cost / usd_rate / azn_rate
             else:
                 self.discounted_cost = 0
                 self.discounted_cost_azn = 0
-
         super(Declaration, self).save(*args, **kwargs)
 
     def __str__(self):

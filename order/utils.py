@@ -1,13 +1,14 @@
 import random
 import string
+from core.models import Discount
 
 def generate_tracking_code():
     return ''.join(random.choices(string.digits, k=13))
 
 def apply_discount(discount, cost):
-    if discount.constant_or_percentage == 'percentage':
+    if discount.constant_or_percentage == Discount.DiscountType.PERCENTAGE:
         return cost - (cost * discount.amount) / 100
-    elif discount.constant_or_percentage == 'constant':
+    elif discount.constant_or_percentage == Discount.DiscountType.CONSTANT:
         return cost - discount.amount
 
 def calculate_discounted_cost(obj, *args, **kwargs):

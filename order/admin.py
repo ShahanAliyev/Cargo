@@ -11,3 +11,6 @@ class DeclarationAdmin(admin.ModelAdmin):
         if not obj.user:
             obj.user = request.user
             super().save_model(request, obj, form, change)
+        else:
+            super().save_model(request, obj, form, change)
+
