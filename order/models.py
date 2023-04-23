@@ -4,6 +4,10 @@ from django.contrib.auth import get_user_model
 from order.utils import calculate_discounted_cost
 from django.db.models import Q
 from decimal import Decimal
+from django.db.models import Max
+from django.core.exceptions import ValidationError
+
+
 
 
 User = get_user_model()
@@ -48,6 +52,7 @@ class Declaration(models.Model):
 
     
     def save(self, *args, **kwargs):
+        
         azn_rate = Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
         usd_rate = Currency.objects.filter(name="USD").values_list('rate', flat=True).first()
 
@@ -55,18 +60,28 @@ class Declaration(models.Model):
             self.status = Status.objects.filter(order = 0).first()
 
         if self.weight and not self.cost:
-            price =  Tariff.objects.filter(Q(max_weight__gte=self.weight) 
-                & Q(min_weight__lte=self.weight) 
-                & Q(country=self.country)).values_list('base_price', flat=True).first()
+            price_list =  Tariff.objects.filter(Q(max_weight__gte=self.weight) 
+                & Q(min_weight__lt=self.weight) 
+                & Q(country=self.country)).values_list('base_price', flat=True).all()
             
-            self.cost = price
-            self.cost_azn = price / Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
+            if len(price_list) == 0:
+                raise ValidationError("There is no assigned price for this weight range")
+
+            elif len(price_list) ==  1:
+                price = price_list.first()
+                self.cost = price
+                self.cost_azn = price / azn_rate
+            
+            elif len(price_list) > 1:
+                price = price_list.aggregate(Max('base_price'))['base_price__max']
+                self.cost = price
+                self.cost_azn = price / azn_rate
 
         if self.cost and self.pk and self.discount:
             discounted_cost = calculate_discounted_cost(self)
             if discounted_cost > 0:
                 self.discounted_cost = discounted_cost
-                self.discounted_cost_azn = Decimal(discounted_cost) * self.cost / usd_rate / azn_rate
+                self.discounted_cost_azn = Decimal(discounted_cost) / usd_rate / azn_rate
             else:
                 self.discounted_cost = 0
                 self.discounted_cost_azn = 0
