@@ -1,8 +1,11 @@
 import factory
 from core.models import (
-    PhonePrefix, WareHouse,
+    PhonePrefix, WareHouse, Country,
+    ProductType, Discount, Tariff
 )
-from user.models import User
+from order.models import Declaration, Status
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class PhonePrefixFactory(factory.django.DjangoModelFactory):
@@ -19,7 +22,6 @@ class WareHouseFactory(factory.django.DjangoModelFactory):
         model = WareHouse
     
     name = "Random Warehouse"
-
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -40,4 +42,65 @@ class UserFactory(factory.django.DjangoModelFactory):
     gov_id = "18092345"
     fin_code = "7BB3DDM"
     client_code = "12345678"
-    warehouse = factory.SubFactory(WareHouseFactory)
+
+
+class StatusFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Status
+    
+    name = "Created"
+    order = 1
+
+
+class CountryFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+
+        model = Country
+    
+    name = "Turkey"
+
+
+class ProductTypeFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+
+        model = ProductType
+    
+    name = "Clothes"
+
+
+class DiscountFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+
+        model = Discount
+    
+    amount = "50"
+    reason = Discount.DiscountReason.YOUNG
+
+
+class TariffFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+
+        model = Tariff
+    
+    min_weight = "0.5"
+    max_weight = "0.6"
+    country = factory.SubFactory(CountryFactory)
+    base_price = '2.8'
+
+
+class DeclarationFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+
+        model = Declaration
+
+    product_price = "1200"
+    country = factory.SubFactory(CountryFactory)
+    product_type = factory.SubFactory(ProductType)
+    shop_name = "Koton"
+    weight = "0.600"

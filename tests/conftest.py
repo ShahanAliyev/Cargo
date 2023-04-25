@@ -1,21 +1,18 @@
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cargo.settings')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'cargo.test_settings'
-
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cargo.settings")
+django.setup()
 from pytest_factoryboy import register
-from .factories import PhonePrefixFactory, UserFactory, WareHouseFactory
+
+from tests.factories import (PhonePrefixFactory, WareHouseFactory, CountryFactory,
+                             ProductTypeFactory, DiscountFactory, TariffFactory,
+                             DeclarationFactory, StatusFactory)
 
 register(PhonePrefixFactory)
-register(UserFactory)
 register(WareHouseFactory)
-
-
-
-# import os
-# import django
-# from django.conf import settings
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cargo.settings')
-# django.setup()
-# # Without upper codes terminal pops up error
-
-# pytestmark = [pytest.mark.django_db(databases=["tests_db"])]
+register(CountryFactory)
+register(ProductTypeFactory)
+register(DiscountFactory)
+register(TariffFactory)
+# register(DeclarationFactory)
+register(StatusFactory)
