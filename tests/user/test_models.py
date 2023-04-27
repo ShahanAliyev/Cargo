@@ -2,7 +2,7 @@ import pytest
 from contextlib import nullcontext as does_not_raise
 from django.core.exceptions import ValidationError
 
-#  pytest -p no:pytest-sugar --ignore=postgres_data  shold be used to run tests
+
 @pytest.mark.django_db
 class TestUserModel:
     pytestmark = pytest.mark.django_db

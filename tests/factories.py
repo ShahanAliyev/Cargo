@@ -1,6 +1,6 @@
 import factory
 from core.models import (
-    PhonePrefix, WareHouse,
+    PhonePrefix, LocalWarehouse,
 )
 from user.models import User
 
@@ -16,10 +16,12 @@ class PhonePrefixFactory(factory.django.DjangoModelFactory):
 class WareHouseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = WareHouse
+        model = LocalWarehouse
     
     name = "Random Warehouse"
-
+    address = "Random address"
+    longitude = "123.45678"
+    latitude = "123.45678"
 
 
 class UserFactory(factory.django.DjangoModelFactory):
