@@ -1,12 +1,12 @@
 from django.contrib import admin
 from core.models import (
-    PhonePrefix, WareHouse, Currency, Country,
+    PhonePrefix, LocalWarehouse, Currency, Country,
     ContactUs, ProductType, News, FAQ,
     CategoryFAQ, Discount, Tariff,
     )
 
 admin.site.register(PhonePrefix)
-admin.site.register(WareHouse)
+admin.site.register(LocalWarehouse)
 admin.site.register(Currency)
 admin.site.register(ContactUs)
 admin.site.register(News)
