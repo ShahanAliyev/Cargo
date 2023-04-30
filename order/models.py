@@ -60,8 +60,8 @@ class Declaration(models.Model):
             self.status = Status.objects.filter(order = 0).first()
 
         if self.weight and not self.cost:
-            price_list =  Tariff.objects.filter(Q(max_weight__gte=self.weight) 
-                & Q(min_weight__lt=self.weight) 
+            price_list =  Tariff.objects.filter(Q(max_weight__gt=self.weight) 
+                & Q(min_weight__lte=self.weight) 
                 & Q(country=self.country)).values_list('base_price', flat=True).all()
             
             if len(price_list) == 0:
