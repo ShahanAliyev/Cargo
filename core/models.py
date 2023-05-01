@@ -46,11 +46,10 @@ class Currency(models.Model):
 
     name = models.CharField(max_length=32)
     sign = models.CharField(max_length=1)
-    rate = models.FloatField()
+    rate = models.DecimalField(max_digits=6, decimal_places=4)
 
     def __str__(self):
         return f'{self.name} {self.id}' 
-
 
     class Meta:
         verbose_name_plural = "Currencies"

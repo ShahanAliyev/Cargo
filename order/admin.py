@@ -1,6 +1,15 @@
 from django.contrib import admin
-from order.models import Status
+from order.models import Status, Declaration
 
 admin.site.register(Status)
 
-# Register your models here.
+
+@admin.register(Declaration)
+class DeclarationAdmin(admin.ModelAdmin):
+
+    def save_model(self, request, obj, form, change):
+        if not obj.user:
+            obj.user = request.user
+        super().save_model(request, obj, form, change)
+        
+
