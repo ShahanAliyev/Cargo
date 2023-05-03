@@ -1,4 +1,4 @@
-from core.models import PhonePrefix, WareHouse, Currency
+from core.models import PhonePrefix, LocalWarehouse, Currency
 from django.core.validators import RegexValidator
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_blocked = models.BooleanField(default = False)  
     date_joined = models.DateTimeField(auto_now_add=True)
-    warehouse = models.ForeignKey(WareHouse, on_delete=models.CASCADE, null=True,blank=True)
+    warehouse = models.ForeignKey(LocalWarehouse, on_delete=models.CASCADE, null=True,blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

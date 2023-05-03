@@ -1,8 +1,10 @@
 import factory
 from core.models import (
-    PhonePrefix, WareHouse,
+    PhonePrefix, LocalWarehouse, Currency, Country,
+    ProductType, Discount, Tariff
 )
 from user.models import User
+from order.models import Declaration, Status
 
 
 class PhonePrefixFactory(factory.django.DjangoModelFactory):
@@ -16,10 +18,12 @@ class PhonePrefixFactory(factory.django.DjangoModelFactory):
 class WareHouseFactory(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = WareHouse
+        model = LocalWarehouse
     
     name = "Random Warehouse"
-
+    address = "Random address"
+    longitude = "123.45678"
+    latitude = "123.45678"
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -41,3 +45,72 @@ class UserFactory(factory.django.DjangoModelFactory):
     fin_code = "7BB3DDM"
     client_code = "12345678"
     warehouse = factory.SubFactory(WareHouseFactory)
+
+
+class CurrencyFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Currency
+    
+    name = "TL"
+    sign = "₺"
+    rate = 0.051
+
+
+class CountryFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Country
+    
+    name = "Turkey"
+
+
+class ProductTypeFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = ProductType
+    
+    name = "Dress"
+
+    
+class StatusFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Status
+    
+    name = "Created"
+
+
+class DiscountFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Discount
+    
+    amount = "50"
+    reason = Discount.DiscountReason.YOUNG  
+
+
+class TariffFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Tariff
+    
+    min_weight = 0.5
+    max_weight = 0.6
+    country = factory.SubFactory(CountryFactory)
+    base_price = 3.50
+
+
+class DeclarationFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = Declaration
+
+    product_price = 1200.50
+    product_currency = factory.SubFactory(CurrencyFactory)
+    country = factory.SubFactory(CountryFactory)
+    product_type = factory.SubFactory(ProductTypeFactory)
+    shop_name = "Koton"
+    status = factory.SubFactory(StatusFactory)
+    user = factory.SubFactory(UserFactory)
+    weight = 0.58

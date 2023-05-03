@@ -1,8 +1,12 @@
 from django.db import models
 from core.models import Currency, Country, Discount, ProductType, Tariff
 from django.contrib.auth import get_user_model
-from order.utils import calculate_discounted_cost, generate_tracking_code
+from order.utils import calculate_discounted_cost
 from django.db.models import Q
+from decimal import Decimal
+from django.db.models import Max
+from django.core.exceptions import ValidationError
+
 
 User = get_user_model()
 
@@ -48,13 +52,15 @@ class Declaration(models.Model):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__status = self.status.id
+        if self.status:
+            self.__status = self.status.id
     
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
 
-        if self.id and self.status.id != self.__status:
-            new_status_history = StatusHistory.objects.create(declaration = self, old_status = self.__status, new_status = self.status.id)
-            new_status_history.save()
+        if self.id and self.status:
+            if self.status.id != self.__status:
+                new_status_history = StatusHistory.objects.create(declaration = self, old_status = self.__status, new_status = self.status.id)
+                new_status_history.save()
         if self.cost:
             azn_rate = float(self.cost)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
             usd_rate = float(self.cost)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
@@ -63,20 +69,28 @@ class Declaration(models.Model):
             self.status = Status.objects.filter(order = 0).first()
 
         if self.weight and not self.cost:
-            price =  Tariff.objects.filter(Q(max_weight__gte=self.weight) 
+            price_list =  Tariff.objects.filter(Q(max_weight__gt=self.weight) 
                 & Q(min_weight__lte=self.weight) 
-                & Q(country=self.country)).values_list('base_price', flat=True).first()
+                & Q(country=self.country)).values_list('base_price', flat=True).all()
             
-            self.cost = price
-            self.cost_azn = azn_rate
-            print(self.cost_azn)
+            if len(price_list) == 0:
+                raise ValidationError("There is no assigned price for this weight range")
 
-        if self.cost and self.id and self.discount:
+            elif len(price_list) ==  1:
+                price = price_list.first()
+                self.cost = price
+                self.cost_azn = price / azn_rate
+            
+            elif len(price_list) > 1:
+                price = price_list.aggregate(Max('base_price'))['base_price__max']
+                self.cost = price
+                self.cost_azn = price / azn_rate
 
-            our_cost = calculate_discounted_cost(self)
-            if our_cost > 0:
-                self.discounted_cost = our_cost
-                self.discounted_cost_azn = our_cost*usd_rate / azn_rate
+        if self.cost and self.pk and self.discount:
+            discounted_cost = calculate_discounted_cost(self)
+            if discounted_cost > 0:
+                self.discounted_cost = discounted_cost
+                self.discounted_cost_azn = (discounted_cost) / usd_rate / azn_rate
             else:
                 self.discounted_cost = 0
                 self.discounted_cost_azn = 0
@@ -96,4 +110,4 @@ class StatusHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.declaration} from {self.old_status} to {self.new_status}"
+        return f"{self.declaration}"
