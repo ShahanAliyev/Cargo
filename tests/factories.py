@@ -1,7 +1,7 @@
 import factory
 from core.models import (
     PhonePrefix, LocalWarehouse, Currency, Country,
-    ProductType, Discount, Tariff
+    ProductType, Discount, Tariff, ForeignWarehouse
 )
 from user.models import User
 from order.models import Declaration, Status
@@ -24,6 +24,7 @@ class WareHouseFactory(factory.django.DjangoModelFactory):
     address = "Random address"
     longitude = "123.45678"
     latitude = "123.45678"
+
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -63,6 +64,17 @@ class CountryFactory(factory.django.DjangoModelFactory):
         model = Country
     
     name = "Turkey"
+
+
+class ForeignFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = ForeignWarehouse
+    
+    country = factory.SubFactory(CountryFactory)
+    airwaybill_address = "Random address"
+    address_header = "Random address"
+    address = "Random main address"
 
 
 class ProductTypeFactory(factory.django.DjangoModelFactory):
