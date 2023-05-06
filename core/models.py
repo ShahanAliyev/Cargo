@@ -128,14 +128,14 @@ class ForeignWarehouse(models.Model):
     is_active = models.BooleanField(default=True)
     airwaybill_address = models.CharField(max_length=32)
     address_header = models.CharField(max_length=32)
-    client_code = models.CharField(max_length=8, default="C.code")
-    name_surname = models.CharField(max_length=64, default="User's name and surname")
+    client_code = models.CharField(max_length=8, null=True, blank=True)
+    name_surname = models.CharField(max_length=64, null=True, blank=True)
     address = models.CharField(max_length=128)
-    flexible_data = JSONField()
+    flexible_data = JSONField(null=True, blank=True)
     address_for_user = models.CharField(max_length=256, null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        self.address_for_user = f"{self.client_code}  {self.name_surname} {self.address_header} {self.address_1}"
+        self.address_for_user = f"{self.address_header} "
 
         super(ForeignWarehouse, self).save(*args, **kwargs)
 

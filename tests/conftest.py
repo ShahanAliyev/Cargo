@@ -6,7 +6,7 @@ from tests.factories import (
     PhonePrefixFactory, UserFactory,WareHouseFactory,
     CountryFactory, CurrencyFactory, ProductTypeFactory,
     StatusFactory, DiscountFactory, TariffFactory, 
-    DeclarationFactory
+    DeclarationFactory, ForeignFactory
     )
 
 register(PhonePrefixFactory)
@@ -19,3 +19,4 @@ register(StatusFactory)
 register(DiscountFactory)
 register(TariffFactory)
 register(DeclarationFactory)
+register(ForeignFactory)
