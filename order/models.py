@@ -56,14 +56,14 @@ class Declaration(models.Model):
             self.__status = self.status.id
     
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
+        
+        azn_rate = Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
+        usd_rate = Currency.objects.filter(name="USD").values_list('rate', flat=True).first()
 
         if self.id and self.status:
             if self.status.id != self.__status:
                 new_status_history = StatusHistory.objects.create(declaration = self, old_status = self.__status, new_status = self.status.id)
                 new_status_history.save()
-        if self.cost:
-            azn_rate = float(self.cost)/float(Currency.objects.filter(name="AZN").values_list('rate', flat=True).first())
-            usd_rate = float(self.cost)/float(Currency.objects.filter(name="USD").values_list('rate', flat=True).first())
 
         if not self.status:
             self.status = Status.objects.filter(order = 0).first()
@@ -90,7 +90,7 @@ class Declaration(models.Model):
             discounted_cost = calculate_discounted_cost(self)
             if discounted_cost > 0:
                 self.discounted_cost = discounted_cost
-                self.discounted_cost_azn = (discounted_cost) / usd_rate / azn_rate
+                self.discounted_cost_azn = Decimal(discounted_cost) / usd_rate / azn_rate
             else:
                 self.discounted_cost = 0
                 self.discounted_cost_azn = 0
