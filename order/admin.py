@@ -2,8 +2,6 @@ from django.contrib import admin
 from order.models import Status, Declaration, StatusHistory
 
 admin.site.register(Status)
-admin.site.register(StatusHistory)
-
 
 @admin.register(Declaration)
 class DeclarationAdmin(admin.ModelAdmin):
@@ -14,3 +12,6 @@ class DeclarationAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
         
 
+class StatusHistoryAdmin(admin.ModelAdmin):
+    readonly_fields = ('old_status', 'new_status')
+admin.site.register(StatusHistory, StatusHistoryAdmin)    

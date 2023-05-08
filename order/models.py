@@ -53,9 +53,8 @@ class Declaration(models.Model):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__status = self.status.id if self.status else None
-        return 
-    
+        self.__status = self.status and self.status.id   
+ 
     def save(self, force_insert=False, force_update=False, *args, **kwargs):
         
         azn_rate = Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
@@ -63,7 +62,7 @@ class Declaration(models.Model):
 
         if self.id and self.status:
             if self.status.id != self.__status:
-                new_status_history = StatusHistory.objects.create(declaration = self, old_status = Status.objects.filter(id=self.__status).first(), new_status = Status.objects.filter(id=self.status.id).first())
+                new_status_history = StatusHistory.objects.create(declaration=self, old_status_id=self.__status, new_status_id=self.status.id)
                 new_status_history.save()
 
         if not self.status:
