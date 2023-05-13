@@ -182,8 +182,8 @@ class Tariff(models.Model):
         LIQUID = 1, _('Liquid')
         NOT_LIQUID = 0, _('Not Liquid')
 
-    min_weight = models.DecimalField(max_digits=4, decimal_places=1)
-    max_weight = models.DecimalField(max_digits=4, decimal_places=1)
+    min_weight = models.DecimalField(max_digits=6, decimal_places=3)
+    max_weight = models.DecimalField(max_digits=6, decimal_places=3)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='tariffs')
     base_price = models.DecimalField(max_digits=6, decimal_places=2)
     fixed_or_per_gram = models.IntegerField(choices=FixedPerGram.choices, default=FixedPerGram.PER_GRAM)

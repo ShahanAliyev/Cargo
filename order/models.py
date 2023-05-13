@@ -6,6 +6,7 @@ from django.db.models import Q
 from decimal import Decimal
 from django.db.models import Max
 from django.core.exceptions import ValidationError
+import math
 
 
 User = get_user_model()
@@ -45,7 +46,7 @@ class Declaration(models.Model):
 
     status = models.ForeignKey(Status, on_delete=models.SET_NULL, null=True, blank=True, related_name='declarations')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='declarations', blank=True, null=True)
-    discount = models.ManyToManyField(Discount, related_name='declarations', blank=True)
+    discounts = models.ManyToManyField(Discount, related_name='declarations', blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
     is_paid = models.BooleanField(default=False)
     penalty_status = models.BooleanField(default=False)
@@ -55,7 +56,8 @@ class Declaration(models.Model):
         super().__init__(*args, **kwargs)
         self.__status = self.status and self.status.id   
  
-    def save(self, force_insert=False, force_update=False, *args, **kwargs):
+    
+    def save(self, *args, **kwargs):
         
         azn_rate = Currency.objects.filter(name="AZN").values_list('rate', flat=True).first()
         usd_rate = Currency.objects.filter(name="USD").values_list('rate', flat=True).first()
@@ -69,15 +71,26 @@ class Declaration(models.Model):
             self.status = Status.objects.filter(order = 0).first()
 
         if self.weight and not self.cost:
-            price_list =  Tariff.objects.filter(Q(max_weight__gt=self.weight) 
+            tariff =  Tariff.objects.filter(Q(max_weight__gt=self.weight) 
                 & Q(min_weight__lte=self.weight) 
-                & Q(country=self.country)).values_list('base_price', flat=True).all()
+                & Q(country=self.country)).values('base_price', 'fixed_or_per_gram', 'min_weight').get()
             
-            if len(price_list) == 0:
-                raise ValidationError("There is no assigned price for this weight range")
+            if tariff['fixed_or_per_gram'] == 1:
+                self.cost = tariff['base_price']
+                self.cost_azn = tariff['base_price']/azn_rate
+            else:
+                self.cost = (math.ceil(self.weight / tariff['min_weight'])) * tariff['base_price']
+                self.cost_azn = (math.ceil(self.weight / tariff['min_weight']) * tariff['base_price'])/azn_rate
 
-            elif len(price_list) ==  1:
-                price = price_list.first()
+        if self.cost and self.pk and self.discounts.exists():
+            discounted_cost = calculate_discounted_cost(self)
+            if discounted_cost > 0:
+                self.discounted_cost = discounted_cost
+                self.discounted_cost_azn = Decimal(discounted_cost) / usd_rate / azn_rate
+            else:
+                self.discounted_cost = 0
+                self.discounted_cost_azn = 0
+        super(Declaration, self).save(*args, **kwargs)
 
     def __str__(self):
         return str(self.tracking_code)
