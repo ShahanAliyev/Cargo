@@ -11,6 +11,9 @@ class DeclarationAdmin(admin.ModelAdmin):
             obj.user = request.user
         super().save_model(request, obj, form, change)
         
+    def save_related(self, request, form, formsets, change):
+                super().save_related(request, form, formsets, change)
+                form.instance.save()
 
 class StatusHistoryAdmin(admin.ModelAdmin):
     readonly_fields = ('old_status', 'new_status')
